@@ -1,12 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppRouter from './Router';
-import firebase, {fbAuth} from '../fBase';
+import { fbAuth } from '../fBase';
 
 function App() {
-    const [ isLogin, setIsLogin ] = useState(fbAuth.currentUser);
+    const [init, setInit] = useState(false);
+    const [userObj, setUserObj] = useState(null);
+
+    useEffect(() => {
+        fbAuth.onAuthStateChanged((user) => {
+            if(user)
+            {
+                setUserObj(user);
+            }
+            else
+            {
+                setUserObj(null);
+            }
+            setInit(true);
+        });
+    }, []);
     return (
         <>
-            <AppRouter isLogin={isLogin}/>
+            {init ? <AppRouter userObj={userObj} /> : "initializing"}
             <footer>&copy; real-feed</footer>
         </>
     );
